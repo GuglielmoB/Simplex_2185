@@ -276,7 +276,17 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		float angle = PI * 2 / a_nSubdivisions;
+		vector3 pointA(0, 0, 0);
+		vector3 pointB(a_fRadius * cos(angle * static_cast<float>(i)), a_fRadius * sin(angle * static_cast<float>(i)), 0);
+		vector3 pointC(a_fRadius * cos(angle * static_cast<float>(i + 1)), a_fRadius * sin(angle * static_cast<float>(i + 1)), 0);
+		vector3 upperpointA(0, 0, a_fHeight);
+		AddTri(pointC, pointB, pointA);
+		AddTri(upperpointA, pointB, pointC);
+
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -300,7 +310,19 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		float angle = PI * 2 / a_nSubdivisions;
+		vector3 pointA(0, 0, 0);
+		vector3 pointB(a_fRadius * cos(angle * static_cast<float>(i)), a_fRadius * sin(angle * static_cast<float>(i)), 0);
+		vector3 pointC(a_fRadius * cos(angle * static_cast<float>(i + 1)), a_fRadius * sin(angle * static_cast<float>(i + 1)), 0);
+		vector3 upperpointA(0, 0, a_fHeight);
+		vector3 upperpointB(a_fRadius * cos(angle * static_cast<float>(i)), a_fRadius * sin(angle * static_cast<float>(i)), a_fHeight);
+		vector3 upperpointC(a_fRadius * cos(angle * static_cast<float>(i + 1)), a_fRadius * sin(angle * static_cast<float>(i + 1)), a_fHeight);
+		AddTri(pointC, pointB, pointA);
+		AddTri(upperpointA, upperpointB, upperpointC);
+		AddQuad(upperpointC, upperpointB, pointC, pointB);
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -330,7 +352,26 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		float angle = PI * 2 / a_nSubdivisions;
+		vector3 innerpointA(0, 0, 0);
+		vector3 innerpointB(a_fInnerRadius * cos(angle * static_cast<float>(i)), a_fInnerRadius * sin(angle * static_cast<float>(i)), 0);
+		vector3 innerpointC(a_fInnerRadius * cos(angle * static_cast<float>(i + 1)), a_fInnerRadius * sin(angle * static_cast<float>(i + 1)), 0);
+		vector3 innerupperpointA(0, 0, a_fHeight);
+		vector3 innerupperpointB(a_fInnerRadius * cos(angle * static_cast<float>(i)), a_fInnerRadius * sin(angle * static_cast<float>(i)), a_fHeight);
+		vector3 innerupperpointC(a_fInnerRadius * cos(angle * static_cast<float>(i + 1)), a_fInnerRadius * sin(angle * static_cast<float>(i + 1)), a_fHeight);
+		vector3 outerpointA(0, 0, 0);
+		vector3 outerpointB(a_fOuterRadius * cos(angle * static_cast<float>(i)), a_fOuterRadius * sin(angle * static_cast<float>(i)), 0);
+		vector3 outerpointC(a_fOuterRadius * cos(angle * static_cast<float>(i + 1)), a_fOuterRadius * sin(angle * static_cast<float>(i + 1)), 0);
+		vector3 outerupperpointA(0, 0, a_fHeight);
+		vector3 outerupperpointB(a_fOuterRadius * cos(angle * static_cast<float>(i)), a_fOuterRadius * sin(angle * static_cast<float>(i)), a_fHeight);
+		vector3 outerupperpointC(a_fOuterRadius * cos(angle * static_cast<float>(i + 1)), a_fOuterRadius * sin(angle * static_cast<float>(i + 1)), a_fHeight);
+		AddQuad(innerupperpointB, innerupperpointC, innerpointB, innerpointC);
+		AddQuad(outerupperpointC, outerupperpointB, outerpointC, outerpointB);
+		AddQuad(innerupperpointC, innerupperpointB, outerupperpointC, outerupperpointB);
+		AddQuad(outerpointC, outerpointB, innerpointC, innerpointB);
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -387,7 +428,22 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		float angle1 = PI * 2 / a_nSubdivisions * i;
+		float angle2 = PI * 2 / a_nSubdivisions * (i + 1);
+
+		for (int j = 0; j < a_nSubdivisions; j++) {
+			float angle3 = PI / a_nSubdivisions * (j + 1);
+			float angle4 = PI / a_nSubdivisions * j;
+			vector3 pointA(a_fRadius * cos(angle1) * sin(angle3), a_fRadius * sin(angle1) * sin(angle3), a_fRadius * cos(angle3));
+			vector3 pointB(a_fRadius * cos(angle1) * sin(angle4), a_fRadius * sin(angle1) * sin(angle4), a_fRadius * cos(angle4));
+			vector3 pointC(a_fRadius * cos(angle2) * sin(angle3), a_fRadius * sin(angle2) * sin(angle3), a_fRadius * cos(angle3));
+			vector3 pointD(a_fRadius * cos(angle2) * sin(angle4), a_fRadius *sin(angle2) * sin(angle4), a_fRadius * cos(angle4));
+			AddQuad(pointA, pointC, pointB, pointD);
+		}
+	}
+
 	// -------------------------------
 
 	// Adding information about color
