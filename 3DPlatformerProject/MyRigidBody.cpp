@@ -26,7 +26,7 @@ void MyRigidBody::Init(void)
 
 	m_m4ToWorld = IDENTITY_M4;
 
-	m_nCollidingCount = 0;
+	m_uCollidingCount = 0;
 	m_CollidingArray = nullptr;
 }
 void MyRigidBody::Swap(MyRigidBody& other)
@@ -54,7 +54,7 @@ void MyRigidBody::Swap(MyRigidBody& other)
 
 	std::swap(m_m4ToWorld, other.m_m4ToWorld);
 
-	std::swap(m_nCollidingCount, other.m_nCollidingCount);
+	std::swap(m_uCollidingCount, other.m_uCollidingCount);
 	std::swap(m_CollidingArray, other.m_CollidingArray);
 }
 void MyRigidBody::Release(void)
@@ -198,7 +198,7 @@ MyRigidBody::MyRigidBody(MyRigidBody const& other)
 
 	m_m4ToWorld = other.m_m4ToWorld;
 
-	m_nCollidingCount = other.m_nCollidingCount;
+	m_uCollidingCount = other.m_uCollidingCount;
 	m_CollidingArray = other.m_CollidingArray;
 }
 MyRigidBody& MyRigidBody::operator=(MyRigidBody const& other)
@@ -226,49 +226,49 @@ void MyRigidBody::AddCollisionWith(MyRigidBody* other)
 
 	//insert the entry
 	PRigidBody* pTemp;
-	pTemp = new PRigidBody[m_nCollidingCount + 1];
+	pTemp = new PRigidBody[m_uCollidingCount + 1];
 	if (m_CollidingArray)
 	{
-		memcpy(pTemp, m_CollidingArray, sizeof(MyRigidBody*) * m_nCollidingCount);
+		memcpy(pTemp, m_CollidingArray, sizeof(MyRigidBody*) * m_uCollidingCount);
 		delete[] m_CollidingArray;
 		m_CollidingArray = nullptr;
 	}
-	pTemp[m_nCollidingCount] = other;
+	pTemp[m_uCollidingCount] = other;
 	m_CollidingArray = pTemp;
 
-	++m_nCollidingCount;
+	++m_uCollidingCount;
 }
 void MyRigidBody::RemoveCollisionWith(MyRigidBody* other)
 {
 	//if there are no dimensions return
-	if (m_nCollidingCount == 0)
+	if (m_uCollidingCount == 0)
 		return;
 
 	//we look one by one if its the one wanted
-	for (uint i = 0; i < m_nCollidingCount; i++)
+	for (uint i = 0; i < m_uCollidingCount; i++)
 	{
 		if (m_CollidingArray[i] == other)
 		{
 			//if it is, then we swap it with the last one and then we pop
-			std::swap(m_CollidingArray[i], m_CollidingArray[m_nCollidingCount - 1]);
+			std::swap(m_CollidingArray[i], m_CollidingArray[m_uCollidingCount - 1]);
 			PRigidBody* pTemp;
-			pTemp = new PRigidBody[m_nCollidingCount - 1];
+			pTemp = new PRigidBody[m_uCollidingCount - 1];
 			if (m_CollidingArray)
 			{
-				memcpy(pTemp, m_CollidingArray, sizeof(uint) * (m_nCollidingCount - 1));
+				memcpy(pTemp, m_CollidingArray, sizeof(uint) * (m_uCollidingCount - 1));
 				delete[] m_CollidingArray;
 				m_CollidingArray = nullptr;
 			}
 			m_CollidingArray = pTemp;
 
-			--m_nCollidingCount;
+			--m_uCollidingCount;
 			return;
 		}
 	}
 }
 void MyRigidBody::ClearCollidingList(void)
 {
-	m_nCollidingCount = 0;
+	m_uCollidingCount = 0;
 	if (m_CollidingArray)
 	{
 		delete[] m_CollidingArray;
@@ -333,30 +333,26 @@ bool MyRigidBody::IsColliding(MyRigidBody* const a_pOther)
 	return bColliding;
 }
 
-bool Simplex::MyRigidBody::IsJumping(MyRigidBody * const other)
-{
-	return false;
-}
 
 void MyRigidBody::AddToRenderList(void)
 {
 	if (m_bVisibleBS)
 	{
-		if (m_nCollidingCount > 0)
+		if (m_uCollidingCount > 0)
 			m_pMeshMngr->AddWireSphereToRenderList(glm::translate(m_m4ToWorld, m_v3CenterL) * glm::scale(vector3(m_fRadius)), C_BLUE_CORNFLOWER);
 		else
 			m_pMeshMngr->AddWireSphereToRenderList(glm::translate(m_m4ToWorld, m_v3CenterL) * glm::scale(vector3(m_fRadius)), C_BLUE_CORNFLOWER);
 	}
 	if (m_bVisibleOBB)
 	{
-		if (m_nCollidingCount > 0)
+		if (m_uCollidingCount > 0)
 			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_m4ToWorld, m_v3CenterL) * glm::scale(m_v3HalfWidth * 2.0f), m_v3ColorColliding);
 		else
 			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_m4ToWorld, m_v3CenterL) * glm::scale(m_v3HalfWidth * 2.0f), m_v3ColorNotColliding);
 	}
 	if (m_bVisibleARBB)
 	{
-		if (m_nCollidingCount > 0)
+		if (m_uCollidingCount > 0)
 			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_v3CenterG) * glm::scale(m_v3ARBBSize), C_YELLOW);
 		else
 			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_v3CenterG) * glm::scale(m_v3ARBBSize), C_YELLOW);
@@ -365,7 +361,7 @@ void MyRigidBody::AddToRenderList(void)
 bool MyRigidBody::IsInCollidingArray(MyRigidBody* a_pEntry)
 {
 	//see if the entry is in the set
-	for (uint i = 0; i < m_nCollidingCount; i++)
+	for (uint i = 0; i < m_uCollidingCount; i++)
 	{
 		if (m_CollidingArray[i] == a_pEntry)
 			return true;

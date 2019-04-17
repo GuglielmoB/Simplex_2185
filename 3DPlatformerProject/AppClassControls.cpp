@@ -73,6 +73,8 @@ void Application::ProcessKeyPressed(sf::Event a_event)
 	default: break;
 	case sf::Keyboard::Space:
 		m_sound.play();
+		m_pEntityMngr->ApplyForce(vector3(0.0f, 1.0f, 0.0f), "Steve");
+		
 		break;
 	case sf::Keyboard::LShift:
 	case sf::Keyboard::RShift:
@@ -411,20 +413,31 @@ void Application::ProcessKeyboard(void)
 	for discreet on/off use ProcessKeyboardPressed/Released
 	*/
 #pragma region Steve Controls
+	float fDelta = m_pSystem->GetDeltaTime(0);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	{
 		m_v3Player.x -= 0.1f;
+		m_pEntityMngr->ApplyForce(vector3(-2.0f * fDelta, 0.0f, 0.0f), "Steve");
+	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-		m_v3Player.x += 0.1f;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		{
+			m_v3Player.x += 0.1f;
+			m_pEntityMngr->ApplyForce(vector3(2.0f * fDelta, 0.0f, 0.0f), "Steve");
 
+		}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
 			m_v3Player.z -= 0.1f;
+			m_pEntityMngr->ApplyForce(vector3(0.0f, 0.0f, -2.0f * fDelta), "Steve");
+
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
 			m_v3Player.z += 0.1f;
+			m_pEntityMngr->ApplyForce(vector3(0.0f, 0.0f, 2.0f * fDelta), "Steve");
+
 	}
 #pragma endregion
 

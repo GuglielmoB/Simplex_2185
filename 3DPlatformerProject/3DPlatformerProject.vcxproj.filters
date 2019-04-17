@@ -45,16 +45,19 @@
     <ClCompile Include="ControllerConfiguration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyEntity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MyEntityManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyRigidBody.cpp">
+    <ClCompile Include="MyOctant.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyOctant.cpp">
+    <ClCompile Include="..\C22_Physics\MySolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\C22_Physics\MyEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\C22_Physics\MyRigidBody.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -96,6 +99,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MyOctant.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\C22_Physics\MySolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

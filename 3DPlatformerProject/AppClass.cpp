@@ -4,8 +4,8 @@ void Application::InitVariables(void)
 {
 	//Set the position and target of the camera
 	m_pCameraMngr->SetPositionTargetAndUpward(
-		vector3(0.0f, 0.0f, 100.0f), //Position
-		vector3(0.0f, 0.0f, 99.0f),	//Target
+		vector3(0.0f, 5.0f, 100.0f), //Position
+		vector3(0.0f, 0.0f, 0.0f),	//Target
 		AXIS_Y);					//Up
 
 	MyRigidBody* m_pSteveRB = nullptr; //Rigid Body of the model
@@ -20,11 +20,16 @@ void Application::InitVariables(void)
 	matrix4 mSteve = glm::translate(m_v3Player);
 	m_pEntityMngr->AddEntity("Minecraft\\Steve.obj", "Steve");
 	m_pEntityMngr->SetModelMatrix(mSteve, "Steve");
+	m_pEntityMngr->UsePhysicsSolver();
+
+	
 	for (uint i = 0; i < uInstances; i++) {
 		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj");
 		vector3 v3Position = vector3(0.0f, -1.0f, 0.0f + (float)i * 10);
 		matrix4 m4Position = glm::translate(v3Position);
 		m_pEntityMngr->SetModelMatrix(m4Position);
+		m_pEntityMngr->UsePhysicsSolver(true);
+		m_pEntityMngr->SetMass(1);
 	}
 	//m_uOctantLevels = 1;
 	//m_pRoot = new MyOctant(m_uOctantLevels, 5);

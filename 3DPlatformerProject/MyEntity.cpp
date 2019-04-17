@@ -2,21 +2,67 @@
 using namespace Simplex;
 std::map<String, MyEntity*> MyEntity::m_IDMap;
 //  Accessors
+Simplex::MySolver* Simplex::MyEntity::GetSolver(void) { return m_pSolver; }
+bool Simplex::MyEntity::HasThisRigidBody(MyRigidBody* a_pRigidBody) { return m_pRigidBody == a_pRigidBody; }
+Simplex::MyRigidBody::PRigidBody* Simplex::MyEntity::GetColliderArray(void) { return m_pRigidBody->GetColliderArray(); }
+uint Simplex::MyEntity::GetCollidingCount(void) { return m_pRigidBody->GetCollidingCount(); }
 matrix4 Simplex::MyEntity::GetModelMatrix(void){ return m_m4ToWorld; }
 void Simplex::MyEntity::SetModelMatrix(matrix4 a_m4ToWorld)
 {
-	if (!m_bInMemory)
+	if (!m_bInMemory || m_m4ToWorld == a_m4ToWorld)
 		return;
 
 	m_m4ToWorld = a_m4ToWorld;
 	m_pModel->SetModelMatrix(m_m4ToWorld);
 	m_pRigidBody->SetModelMatrix(m_m4ToWorld);
+
+	if (m_bUsePhysicsSolver) {
+		//experimental way of calculating a matrix components
+		glm::vec3 scale;
+		glm::quat orientation;
+		glm::vec3 translation;
+		glm::vec3 skew;
+		glm::vec4 perspective;
+		glm::decompose(m_m4ToWorld, scale, orientation, translation, skew, perspective);
+
+		//TODO: this is a hot fix the orientation inverses itself without this using the decompose
+		matrix4 temp = glm::translate(translation) * ToMatrix4(orientation) * glm::scale(scale);
+		glm::decompose(temp, scale, orientation, translation, skew, perspective);
+		//....
+
+		m_pSolver->SetPosition(translation);
+		m_pSolver->SetOrientation(orientation);
+		m_pSolver->SetSize(scale);
+	}
 }
 Model* Simplex::MyEntity::GetModel(void){return m_pModel;}
 MyRigidBody* Simplex::MyEntity::GetRigidBody(void){	return m_pRigidBody; }
 bool Simplex::MyEntity::IsInitialized(void){ return m_bInMemory; }
 String Simplex::MyEntity::GetUniqueID(void) { return m_sUniqueID; }
 void Simplex::MyEntity::SetAxisVisible(bool a_bSetAxis) { m_bSetAxis = a_bSetAxis; }
+void Simplex::MyEntity::SetPosition(vector3 a_v3Position) { if(m_pSolver) m_pSolver->SetPosition(a_v3Position); }
+Simplex::vector3 Simplex::MyEntity::GetPosition(void)
+{
+	if (m_pSolver != nullptr)
+		return m_pSolver->GetPosition();
+	return vector3();
+}
+
+void Simplex::MyEntity::SetVelocity(vector3 a_v3Velocity) { if (m_pSolver) m_pSolver->SetVelocity(a_v3Velocity); }
+Simplex::vector3 Simplex::MyEntity::GetVelocity(void)
+{
+	if (m_pSolver != nullptr)
+		return m_pSolver->GetVelocity();
+	return vector3();
+}
+
+void Simplex::MyEntity::SetMass(float a_fMass) { if (m_pSolver) m_pSolver->SetMass(a_fMass); }
+float Simplex::MyEntity::GetMass(void)
+{
+	if (m_pSolver != nullptr)
+		return m_pSolver->GetMass();
+	return 1.0f;
+}
 //  MyEntity
 void Simplex::MyEntity::Init(void)
 {
@@ -29,6 +75,8 @@ void Simplex::MyEntity::Init(void)
 	m_m4ToWorld = IDENTITY_M4;
 	m_sUniqueID = "";
 	m_nDimensionCount = 0;
+	m_bUsePhysicsSolver = false;
+	m_pSolver = nullptr;
 }
 void Simplex::MyEntity::Swap(MyEntity& other)
 {
@@ -42,6 +90,7 @@ void Simplex::MyEntity::Swap(MyEntity& other)
 	std::swap(m_bSetAxis, other.m_bSetAxis);
 	std::swap(m_nDimensionCount, other.m_nDimensionCount);
 	std::swap(m_DimensionArray, other.m_DimensionArray);
+	std::swap(m_pSolver, other.m_pSolver);
 }
 void Simplex::MyEntity::Release(void)
 {
@@ -55,6 +104,7 @@ void Simplex::MyEntity::Release(void)
 		m_DimensionArray = nullptr;
 	}
 	SafeDelete(m_pRigidBody);
+	SafeDelete(m_pSolver);
 	m_IDMap.erase(m_sUniqueID);
 }
 //The big 3
@@ -72,6 +122,7 @@ Simplex::MyEntity::MyEntity(String a_sFileName, String a_sUniqueID)
 		m_pRigidBody = new MyRigidBody(m_pModel->GetVertexList()); //generate a rigid body
 		m_bInMemory = true; //mark this entity as viable
 	}
+	m_pSolver = new MySolver();
 }
 Simplex::MyEntity::MyEntity(MyEntity const& other)
 {
@@ -85,7 +136,7 @@ Simplex::MyEntity::MyEntity(MyEntity const& other)
 	m_bSetAxis = other.m_bSetAxis;
 	m_nDimensionCount = other.m_nDimensionCount;
 	m_DimensionArray = other.m_DimensionArray;
-
+	m_pSolver = new MySolver(*other.m_pSolver);
 }
 MyEntity& Simplex::MyEntity::operator=(MyEntity const& other)
 {
@@ -249,8 +300,38 @@ bool Simplex::MyEntity::IsColliding(MyEntity* const other)
 void Simplex::MyEntity::ClearCollisionList(void)
 {
 	m_pRigidBody->ClearCollidingList();
+	m_pSolver->SetIsColliding(false);
 }
 void Simplex::MyEntity::SortDimensions(void)
 {
 	std::sort(m_DimensionArray, m_DimensionArray + m_nDimensionCount);
+}
+void Simplex::MyEntity::ApplyForce(vector3 a_v3Force)
+{
+	m_pSolver->ApplyForce(a_v3Force);
+}
+void Simplex::MyEntity::Update(void)
+{
+	if (m_bUsePhysicsSolver)
+	{
+		if (m_pRigidBody->GetCollidingCount() > 0)
+			m_pSolver->SetIsColliding(true);
+
+		m_pSolver->Update();
+
+		//SetModelMatrix(glm::translate(m_pSolver->GetPosition()) * glm::scale(m_pSolver->GetSize()));
+		quaternion temp = m_pSolver->GetOrientation();
+		SetModelMatrix(glm::translate(m_pSolver->GetPosition()) * ToMatrix4(temp) *  glm::scale(m_pSolver->GetSize()));
+	}
+}
+void Simplex::MyEntity::ResolveCollision(MyEntity* a_pOther)
+{
+	if (m_bUsePhysicsSolver)
+	{
+		m_pSolver->ResolveCollision(a_pOther->GetSolver());
+	}
+}
+void Simplex::MyEntity::UsePhysicsSolver(bool a_bUse)
+{
+	m_bUsePhysicsSolver = a_bUse;
 }
