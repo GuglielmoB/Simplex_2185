@@ -19,18 +19,24 @@ namespace Simplex
 	//Adding Application to the Simplex namespace
 class Application
 {
-	vector3 m_v3Player; //position of the player
-	MyEntityManager* m_pEntityMngr = nullptr; //Entity Manager
+	vector3 m_v3Gravity = vector3(0.0f, -0.8f, 0.0f);
+    bool m_bIsPlayerOnGround = false; // whether or not the player is on the ground
+	vector3 m_v3PlayerVelo = vector3(0.0f);
+	float m_fPlayerJumpVelo = 3.6f; // instantaneous y velocity applied when player jumps
 
-	MyOctant* m_pRoot = nullptr; // the root octant
-	uint m_uOctantID = -1; //Index of Octant to display
-	uint m_uObjects = 0; //Number of objects in the normal scene
-	uint m_uObjectsCrazyMode = 0; // number of objects added by crazymode
-	uint uInstancesCrazyMode = 0;
-	int nSquareCrazyMode = 0;
-	uint uIndexCrazyMode = -1;
-	uint m_uOctantLevels = 0; //Number of levels in the octree
-	vector3 m_COffset;
+
+
+
+	vector3 m_v3Player; //position of the player
+	quaternion m_qPlayer;
+	matrix4 mSteve;
+	vector3 m_v3Creeper; //position of the player
+	vector3 m_v3Land; //position of the player
+	MyEntityManager* m_pEntityMngr = nullptr; //Entity Manager
+	//MyOctant* m_pRoot = nullptr; // the root octant
+	//uint m_uOctantID = -1; //Index of Octant to display
+	uint m_uObjects = 0; //Number of objects in the scene
+	//uint m_uOctantLevels = 0; //Number of levels in the octree
 private:
 	String m_sProgrammer = "Brandon Guglielmo - beg9837@rit.edu"; //programmer
 
@@ -39,6 +45,11 @@ private:
 	bool m_bGUI_Console = true; //show Credits GUI window?
 	bool m_bGUI_Test = false; //show Test GUI window?
 	bool m_bGUI_Controller = false; //show Controller GUI window?
+
+	bool blocks[7][7];
+	std::vector<vector2> optimalPath;
+	int pathIndex = 1;
+
 
 	uint m_uRenderCallCount = 0; //count of render calls per frame
 	uint m_uControllerCount = 0; //count of controllers connected
@@ -207,6 +218,8 @@ private:
 	OUTPUT: ---
 	*/
 	void CameraRotation(float a_fSpeed = 0.005f);
+	std::vector<vector2> ConstructPath(void);
+
 #pragma endregion
 
 #pragma region Process Events

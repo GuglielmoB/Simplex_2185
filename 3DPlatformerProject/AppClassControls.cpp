@@ -73,7 +73,6 @@ void Application::ProcessKeyPressed(sf::Event a_event)
 	default: break;
 	case sf::Keyboard::Space:
 		m_sound.play();
-		m_pEntityMngr->ApplyForce(vector3(0.0f, 1.0f, 0.0f), "Steve");
 		
 		break;
 	case sf::Keyboard::LShift:
@@ -98,51 +97,37 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 		m_bRunning = false;
 		break;
 	case sf::Keyboard::F1:
-		uInstancesCrazyMode = 1849;
-		nSquareCrazyMode = static_cast<int>(std::sqrt(uInstancesCrazyMode));
-		m_uObjectsCrazyMode = nSquareCrazyMode * nSquareCrazyMode;
-		uIndexCrazyMode = -1;
-		for (int i = 0; i < nSquareCrazyMode; i++)
-		{
-				uIndexCrazyMode++;
-				m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "CrazyCube" + uIndexCrazyMode);
-				vector3 v3Position = vector3(glm::sphericalRand(34.0f));
-				matrix4 m4Position = glm::translate(v3Position);
-				m_pEntityMngr->SetModelMatrix(m4Position);
-			
-		}
+		m_pCameraMngr->SetCameraMode(CAM_PERSP);
 		break;
 	case sf::Keyboard::F2:
-		uInstancesCrazyMode = 1849;
-		nSquareCrazyMode = static_cast<int>(std::sqrt(uInstancesCrazyMode));
-		m_uObjectsCrazyMode = nSquareCrazyMode * nSquareCrazyMode;
-		uIndexCrazyMode = -1;
-		for (int i = 0; i < nSquareCrazyMode; i++)
-		{
-				uIndexCrazyMode++;
-				m_pEntityMngr->RemoveEntity("CrazyCube" + uIndexCrazyMode);	
-		}
+		m_pCameraMngr->SetCameraMode(CAM_ORTHO_Z);
 		break;
-
+	case sf::Keyboard::F3:
+		m_pCameraMngr->SetCameraMode(CAM_ORTHO_Y);
+		break;
+	case sf::Keyboard::F4:
+		m_pCameraMngr->SetCameraMode(CAM_ORTHO_X);
+		break;
 	case sf::Keyboard::F:
 		bFPSControl = !bFPSControl;
 		m_pCameraMngr->SetFPS(bFPSControl);
 		break;
-	case sf::Keyboard::PageUp:
+	/*case sf::Keyboard::PageUp:
 		++m_uOctantID;
 		if (m_uOctantID >= m_pRoot->GetOctantCount())
 			m_uOctantID = - 1;
 		
 		break;
-		
-	case sf::Keyboard::PageDown:
+		*/
+	/*case sf::Keyboard::PageDown:
 		--m_uOctantID;
 		if (m_uOctantID >= m_pRoot->GetOctantCount())
 			m_uOctantID = - 1;
 		
 		break;
+		*/
 	case sf::Keyboard::Add:
-		
+		/*
 		if (m_uOctantLevels < 4)
 		{
 			m_pEntityMngr->ClearDimensionSetAll();
@@ -151,9 +136,9 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 			m_pRoot = new MyOctant(m_uOctantLevels, 5);
 		}
 		break;
-		
+		*/
 	case sf::Keyboard::Subtract:
-		
+		/*
 		if (m_uOctantLevels > 0)
 		{
 			m_pEntityMngr->ClearDimensionSetAll();
@@ -161,7 +146,7 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 			SafeDelete(m_pRoot);
 			m_pRoot = new MyOctant(m_uOctantLevels, 5);
 		}
-		break; 
+		break; */
 	case sf::Keyboard::LShift:
 	case sf::Keyboard::RShift:
 		m_bModifier = false;
@@ -443,16 +428,22 @@ void Application::ProcessKeyboard(void)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
 			m_v3Player.z -= 0.1f;
-			m_pEntityMngr->ApplyForce(vector3(0.0f, 0.0f, 2.0f * fDelta), "Steve");
+			m_pEntityMngr->ApplyForce(vector3(0.0f, 0.0f, -2.0f * fDelta), "Steve");
 
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
 			m_v3Player.z += 0.1f;
-			m_pEntityMngr->ApplyForce(vector3(0.0f, 0.0f, -2.0f * fDelta), "Steve");
+			m_pEntityMngr->ApplyForce(vector3(0.0f, 0.0f, 2.0f * fDelta), "Steve");
 
 	}
+
+	
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)
+		&& m_bIsPlayerOnGround) // jump
+		m_v3PlayerVelo.y = m_fPlayerJumpVelo;
 #pragma endregion
 
 #pragma region Camera Position
@@ -481,6 +472,13 @@ void Application::ProcessKeyboard(void)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
 		m_pCameraMngr->MoveVertical(m_fMovementSpeed * fMultiplier);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
+	{
+		if (m_bModifier)
+			m_qPlayer = m_qPlayer * glm::angleAxis(glm::radians(1.0f), AXIS_Y);
+		else
+			m_qPlayer = m_qPlayer * glm::angleAxis(glm::radians(-1.0f), AXIS_Y);
+	}
 #pragma endregion
 }
 //Joystick

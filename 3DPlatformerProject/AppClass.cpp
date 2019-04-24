@@ -4,42 +4,83 @@ void Application::InitVariables(void)
 {
 	//Set the position and target of the camera
 	m_pCameraMngr->SetPositionTargetAndUpward(
-		vector3(0.0f, 5.0f, 100.0f), //Position
+		vector3(0.0f, 5.0f, 25.0f), //Position
 		vector3(0.0f, 0.0f, 0.0f),	//Target
 		AXIS_Y);					//Up
 
-	MyRigidBody* m_pSteveRB = nullptr; //Rigid Body of the model
 	m_pLightMngr->SetPosition(vector3(0.0f, 3.0f, 13.0f), 1); //set the position of first light (0 is reserved for ambient light)
 
+
 #ifdef DEBUG
-	uint uInstances = 30;
+	uint uInstances = 50;
 #else
 	uint uInstances = 30;
 #endif
-	m_v3Player = vector3(0.0f, 0.0f, 0.0f);
-	matrix4 mSteve = glm::translate(m_v3Player);
+
+
+
 	m_pEntityMngr->AddEntity("Minecraft\\Steve.obj", "Steve");
+	m_v3Player = vector3(1, 0, 1);
+    mSteve = glm::translate(m_v3Player) * ToMatrix4(m_qPlayer) * ToMatrix4(m_qArcBall);
 	m_pEntityMngr->SetModelMatrix(mSteve, "Steve");
 	m_pEntityMngr->UsePhysicsSolver();
-
 	
-	for (uint i = 0; i < uInstances; i++) {
-		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj");
-		vector3 v3Position = vector3(0.0f, -1.0f, 0.0f + (float)i * 10);
-		matrix4 m4Position = glm::translate(v3Position);
-		m_pEntityMngr->SetModelMatrix(m4Position);
-		m_pEntityMngr->UsePhysicsSolver(true);
-		m_pEntityMngr->SetMass(1);
+
+
+	optimalPath = ConstructPath();
+
+	for (int i = 0; i < 30; i++) {
+		for (int j = 0; j < 30; j++) {
+			bool isPath = false;
+
+
+			if (!isPath) {
+				m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Floor_" + std::to_string(i) + "_" + std::to_string(j)); //the other floor is there too i guess
+				m_v3Player = vector3(i * 2.01f, -2.01f, j * 2.01f);
+			}
+
+			mSteve = glm::translate(m_v3Player);
+			m_pEntityMngr->SetModelMatrix(mSteve * glm::scale(vector3(2.0f)));
+		}
 	}
-	m_uOctantLevels = 1;
-	m_pRoot = new MyOctant(m_uOctantLevels, 5);
-	//m_COffset = m_pCameraMngr->GetPosition() - m_v3Player;
-	//m_pCameraMngr->SetPosition(m_v3Player - m_COffset);
-	//glm::lookAt(m_pCameraMngr->GetPosition(), m_pCameraMngr->GetPosition() + m_v3Player, vector3(0.0f, 0.0f, 0.0f));
-	m_pEntityMngr->Update();
+
+
+	/*
+	m_v3Creeper = vector3(30.0f, 0.0f, 0.0f);
+	matrix4 mCreeper = glm::translate(m_v3Creeper);
+	m_pEntityMngr->AddEntity("Minecraft\\Creeper.obj", "Creeper");
+	m_pEntityMngr->SetModelMatrix(mCreeper, "Creeper");
+	m_pEntityMngr->UsePhysicsSolver();
+	m_pEntityMngr->SetPosition(m_v3Creeper,"Creeper");
+
+
+	m_v3Elk = vector3(20.0f, 0.0f, 0.0f);
+	matrix4 mElk = glm::translate(m_v3Elk);
+	m_pEntityMngr->AddEntity("Minecraft\\elk.obj", "Elk");
+	m_pEntityMngr->SetModelMatrix(mElk, "Elk");
+	m_pEntityMngr->UsePhysicsSolver();
+	m_pEntityMngr->SetPosition(m_v3Elk, "Elk");
+	
+
+	for (uint i = 0; i < uInstances; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Cube"+i);
+		vector3 v3Position = vector3(0.0f, 2.0f, 0.0f + (float)i * 10);
+		matrix4 m4Position = glm::translate(v3Position);
+		m_pEntityMngr->SetModelMatrix(m4Position, "Cube"+i);
+		m_pEntityMngr->SetPosition(v3Position, "Cube"+i);
+		m_pEntityMngr->UsePhysicsSolver();
+		m_pEntityMngr->SetMass(.8);
+	}
+	*/
+
+
+	//m_uOctantLevels = 1;
+	//m_pRoot = new MyOctant(m_uOctantLevels, 5);
+	//m_pEntityMngr->Update();
 }
 void Application::Update(void)
 {
+	bool colliding = false;
 	//Update the system so it knows how much time has passed since the last call
 	m_pSystem->Update();
 
@@ -47,24 +88,40 @@ void Application::Update(void)
 	ArcBall();
 
 	//Is the first person camera active?
-	//m_COffset = m_pCameraMngr->GetPosition() - m_v3Player;
-	//m_pCameraMngr->SetPosition(m_v3Player - m_COffset);
 	CameraRotation();
 
+	mSteve = glm::translate(m_v3Player) * ToMatrix4(m_qPlayer) * ToMatrix4(m_qArcBall);
+	m_pEntityMngr->SetModelMatrix(mSteve, "Steve");
 
 	//Update Entity Manager
-	m_pEntityMngr -> SetModelMatrix(glm::translate(m_v3Player), "Steve");
 	m_pEntityMngr->Update();
+	m_pEntityMngr->SetModelMatrix(glm::translate(m_v3Player), "Steve");
 
 	//Add objects to render list
 	m_pEntityMngr->AddEntityToRenderList(-1, true);
+
+	m_v3Player += m_v3PlayerVelo * .5;
+
+	// clamp player to ground
+	if (m_v3Player.y < 0)
+		m_v3Player.y = 0;
+
+	// check if player is on ground
+	m_bIsPlayerOnGround = m_v3Player.y == 0;
+
+	m_v3PlayerVelo += m_v3Gravity * .5;
+
+	if (colliding == true && m_v3Player.y > 5) {
+		m_v3Player.y = m_v3Player.y;
+	}
+
 }
 void Application::Display(void)
 {
 	// Clear the screen
 	ClearScreen();
 
-	
+	/*
 	if (m_uOctantID == -1) 
 	{
 		m_pRoot->Display();
@@ -72,12 +129,12 @@ void Application::Display(void)
 	else {
 		m_pRoot->Display(m_uOctantID);
 	}
-	
+	*/
 	//display octree
-	m_pRoot->Display();
+	//m_pRoot->Display();
 	
 	// draw a skybox
-	m_pMeshMngr->AddSkyboxToRenderList();
+	m_pMeshMngr->AddSkyboxToRenderList("Skybox_01.png");
 	
 	//render list call
 	m_uRenderCallCount = m_pMeshMngr->Render();
@@ -91,9 +148,52 @@ void Application::Display(void)
 	//end the current frame (internally swaps the front and back buffers)
 	m_pWindow->display();
 }
+
+std::vector<vector2> Application::ConstructPath(void) { //makes the path
+	std::vector<vector2> path;
+	int x = 0;
+	int y = 0;
+
+	while (vector2(x, y) != vector2(6, 6)) {
+		path.push_back(vector2(x, y));
+
+		if (x < 6 && !blocks[x + 1][y]) //steve tries to go through unblocked terrain first
+			x++;
+
+		else if (y < 6 && !blocks[x][y + 1])
+			y++;
+
+		else if (x < 6) { //eventually he pushes through
+			x++;
+
+			for (int i = 1; i < 7 - x; i++) { //steve is smart and tries to avoid terrain he just pushed in front of himself
+				if (!blocks[x + i][y]) {
+					blocks[x + i][y] = true;
+					i = 7;
+				}
+			}
+			blocks[x][y] = false;
+		}
+		else {
+			y++;
+
+			for (int i = 1; i < 7 - y; i++) {
+				if (!blocks[x][y + i]) {
+					blocks[x][y + i] = true;
+					i = 7;
+				}
+			}
+			blocks[x][y] = false;
+		}
+	}
+
+	path.push_back(vector2(6, 6));
+
+	return path;
+}
 void Application::Release(void)
 {
-	//release the Entity
+	MyEntityManager::ReleaseInstance();
 
 	// delete(m_pRoot);
 	//release GUI
