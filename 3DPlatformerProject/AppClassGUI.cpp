@@ -43,11 +43,12 @@ void Application::DrawGUI(void)
 //			ImGui::Text("Objects: %d\n", m_uObjects);
 			ImGui::Separator();
 			ImGui::Text("Control:\n");
-			ImGui::Text("   WASD: Movement\n");
-			ImGui::Text("	 F1: Perspective\n");
-			ImGui::Text("	 F2: Orthographic X\n");
-			ImGui::Text("	 F3: Orthographic Y\n");
-			ImGui::Text("	 F4: Orthographic Z\n");
+			ImGui::Text("   Arrows: Movement\n");
+			ImGui::Text("   Space: Jump\n");
+			ImGui::Text("	 F1: Crazy Mode\n");
+			ImGui::Text("	 F2: Normal Mode X\n");
+			//ImGui::Text("	 F3: Orthographic Y\n");
+			//ImGui::Text("	 F4: Orthographic Z\n");
 			ImGui::Separator();
 			ImGui::Text(" PageUp: Increment Octant display\n");
 			ImGui::Text(" PageDw: Decrement Octant display\n");

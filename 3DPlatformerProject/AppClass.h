@@ -21,10 +21,16 @@ class Application
 {
 	vector3 m_v3Player; //position of the player
 	MyEntityManager* m_pEntityMngr = nullptr; //Entity Manager
-	//MyOctant* m_pRoot = nullptr; // the root octant
-	//uint m_uOctantID = -1; //Index of Octant to display
-	uint m_uObjects = 0; //Number of objects in the scene
-	//uint m_uOctantLevels = 0; //Number of levels in the octree
+
+	MyOctant* m_pRoot = nullptr; // the root octant
+	uint m_uOctantID = -1; //Index of Octant to display
+	uint m_uObjects = 0; //Number of objects in the normal scene
+	uint m_uObjectsCrazyMode = 0; // number of objects added by crazymode
+	uint uInstancesCrazyMode = 0;
+	int nSquareCrazyMode = 0;
+	uint uIndexCrazyMode = -1;
+	uint m_uOctantLevels = 0; //Number of levels in the octree
+	vector3 m_COffset;
 private:
 	String m_sProgrammer = "Brandon Guglielmo - beg9837@rit.edu"; //programmer
 

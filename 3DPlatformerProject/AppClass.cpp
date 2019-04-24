@@ -31,8 +31,11 @@ void Application::InitVariables(void)
 		m_pEntityMngr->UsePhysicsSolver(true);
 		m_pEntityMngr->SetMass(1);
 	}
-	//m_uOctantLevels = 1;
-	//m_pRoot = new MyOctant(m_uOctantLevels, 5);
+	m_uOctantLevels = 1;
+	m_pRoot = new MyOctant(m_uOctantLevels, 5);
+	//m_COffset = m_pCameraMngr->GetPosition() - m_v3Player;
+	//m_pCameraMngr->SetPosition(m_v3Player - m_COffset);
+	//glm::lookAt(m_pCameraMngr->GetPosition(), m_pCameraMngr->GetPosition() + m_v3Player, vector3(0.0f, 0.0f, 0.0f));
 	m_pEntityMngr->Update();
 }
 void Application::Update(void)
@@ -44,8 +47,11 @@ void Application::Update(void)
 	ArcBall();
 
 	//Is the first person camera active?
+	//m_COffset = m_pCameraMngr->GetPosition() - m_v3Player;
+	//m_pCameraMngr->SetPosition(m_v3Player - m_COffset);
 	CameraRotation();
-	
+
+
 	//Update Entity Manager
 	m_pEntityMngr -> SetModelMatrix(glm::translate(m_v3Player), "Steve");
 	m_pEntityMngr->Update();
@@ -58,7 +64,7 @@ void Application::Display(void)
 	// Clear the screen
 	ClearScreen();
 
-	/*
+	
 	if (m_uOctantID == -1) 
 	{
 		m_pRoot->Display();
@@ -66,9 +72,9 @@ void Application::Display(void)
 	else {
 		m_pRoot->Display(m_uOctantID);
 	}
-	*/
+	
 	//display octree
-	//m_pRoot->Display();
+	m_pRoot->Display();
 	
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
