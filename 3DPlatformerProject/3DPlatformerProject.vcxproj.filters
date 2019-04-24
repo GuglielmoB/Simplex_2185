@@ -16,6 +16,9 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{8e4b1616-c324-4a7c-ad87-7a97c6aedb32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Models">
+      <UniqueIdentifier>{81f50504-b55c-4661-8b27-00a531327eab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
