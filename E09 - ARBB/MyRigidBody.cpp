@@ -14,11 +14,11 @@ void MyRigidBody::Init(void)
 	m_v3ColorNotColliding = C_WHITE;
 
 	m_v3Center = ZERO_V3;
-	m_v3MinL = ZERO_V3;
-	m_v3MaxL = ZERO_V3;
+	m_v3Minimum = ZERO_V3;
+	m_v3Maximum = ZERO_V3;
 
-	m_v3MinG = ZERO_V3;
-	m_v3MaxG = ZERO_V3;
+	m_v3MinimumG = ZERO_V3;
+	m_v3MaximumG = ZERO_V3;
 
 	m_v3HalfWidth = ZERO_V3;
 	m_v3ARBBSize = ZERO_V3;
@@ -38,11 +38,11 @@ void MyRigidBody::Swap(MyRigidBody& other)
 	std::swap(m_v3ColorNotColliding, other.m_v3ColorNotColliding);
 
 	std::swap(m_v3Center, other.m_v3Center);
-	std::swap(m_v3MinL, other.m_v3MinL);
-	std::swap(m_v3MaxL, other.m_v3MaxL);
+	std::swap(m_v3Minimum, other.m_v3Minimum);
+	std::swap(m_v3Maximum, other.m_v3Maximum);
 
-	std::swap(m_v3MinG, other.m_v3MinG);
-	std::swap(m_v3MaxG, other.m_v3MaxG);
+	std::swap(m_v3MinimumG, other.m_v3MinimumG);
+	std::swap(m_v3MaximumG, other.m_v3MaximumG);
 
 	std::swap(m_v3HalfWidth, other.m_v3HalfWidth);
 	std::swap(m_v3ARBBSize, other.m_v3ARBBSize);
@@ -69,11 +69,11 @@ vector3 MyRigidBody::GetColorNotColliding(void) { return m_v3ColorNotColliding; 
 void MyRigidBody::SetColorColliding(vector3 a_v3Color) { m_v3ColorColliding = a_v3Color; }
 void MyRigidBody::SetColorNotColliding(vector3 a_v3Color) { m_v3ColorNotColliding = a_v3Color; }
 vector3 MyRigidBody::GetCenterLocal(void) { return m_v3Center; }
-vector3 MyRigidBody::GetMinLocal(void) { return m_v3MinL; }
-vector3 MyRigidBody::GetMaxLocal(void) { return m_v3MaxL; }
+vector3 MyRigidBody::GetMinLocal(void) { return m_v3Minimum; }
+vector3 MyRigidBody::GetMaxLocal(void) { return m_v3Maximum; }
 vector3 MyRigidBody::GetCenterGlobal(void){	return vector3(m_m4ToWorld * vector4(m_v3Center, 1.0f)); }
-vector3 MyRigidBody::GetMinGlobal(void) { return m_v3MinG; }
-vector3 MyRigidBody::GetMaxGlobal(void) { return m_v3MaxG; }
+vector3 MyRigidBody::GetMinGlobal(void) { return m_v3MinimumG; }
+vector3 MyRigidBody::GetMaxGlobal(void) { return m_v3MaximumG; }
 vector3 MyRigidBody::GetHalfWidth(void) { return m_v3HalfWidth; }
 matrix4 MyRigidBody::GetModelMatrix(void) { return m_m4ToWorld; }
 void MyRigidBody::SetModelMatrix(matrix4 a_m4ModelMatrix)
@@ -82,15 +82,50 @@ void MyRigidBody::SetModelMatrix(matrix4 a_m4ModelMatrix)
 	if (a_m4ModelMatrix == m_m4ToWorld)
 		return;
 
+	//Assign the model matrix
 	m_m4ToWorld = a_m4ModelMatrix;
-	
-	//your code goes here---------------------
-	m_v3MinG = m_v3MinL;
-	m_v3MaxG = m_v3MaxL;
-	//----------------------------------------
+	std::vector<vector3> OBBCorners;
+	// This vector and the following pushes are to get the  corners of the cube surrounding the object.
 
-	//we calculate the distance between min and max vectors
-	m_v3ARBBSize = m_v3MaxG - m_v3MinG;
+	OBBCorners.push_back(vector3(m_v3Minimum.x, m_v3Minimum.y, m_v3Maximum.z));
+	OBBCorners.push_back(vector3(m_v3Maximum.x, m_v3Minimum.y, m_v3Maximum.z));
+	OBBCorners.push_back(vector3(m_v3Minimum.x, m_v3Maximum.y, m_v3Maximum.z));
+	OBBCorners.push_back(vector3(m_v3Maximum.x, m_v3Maximum.y, m_v3Maximum.z));
+	OBBCorners.push_back(vector3(m_v3Minimum.x, m_v3Minimum.y, m_v3Minimum.z));
+	OBBCorners.push_back(vector3(m_v3Maximum.x, m_v3Minimum.y, m_v3Minimum.z));
+	OBBCorners.push_back(vector3(m_v3Maximum.x, m_v3Maximum.y, m_v3Minimum.z));
+	OBBCorners.push_back(vector3(m_v3Minimum.x, m_v3Maximum.y, m_v3Minimum.z));
+
+
+	m_v3MinimumG = m_v3MaximumG = vector3(m_m4ToWorld * vector4(OBBCorners[0], 1)); // Sets default value for global minimum and maximum
+	uint CornerCount = OBBCorners.size(); // Gets the size of the vector (could hard code this to 8 entries but I figured I'd leave it "dynamic")
+	for (uint i = 0; i < CornerCount; i++) { // Loop to globalize the corners
+		OBBCorners[i] = (vector3(m_m4ToWorld * vector4(OBBCorners[i], 1)));
+
+	}
+
+	for (uint i = 0; i < CornerCount; i++) // This loop is to create the minimum and maximum values for the ARBB
+	{
+		if (m_v3MinimumG.x > OBBCorners[i].x)
+			m_v3MinimumG.x = OBBCorners[i].x;
+
+		else if (m_v3MaximumG.x < OBBCorners[i].x)
+			m_v3MaximumG.x = OBBCorners[i].x;
+
+		if (m_v3MinimumG.y > OBBCorners[i].y)
+			m_v3MinimumG.y = OBBCorners[i].y;
+
+		else if (m_v3MaximumG.y < OBBCorners[i].y)
+			m_v3MaximumG.y = OBBCorners[i].y;
+
+		if (m_v3MinimumG.z > OBBCorners[i].z)
+			m_v3MinimumG.z = OBBCorners[i].z;
+
+		else if (m_v3MaximumG.z < OBBCorners[i].z)
+			m_v3MaximumG.z = OBBCorners[i].z;
+	}
+
+	m_v3ARBBSize = m_v3MaximumG - m_v3MinimumG; // sets the ARBB's size to the maximum global value - the minimum global value
 }
 //The big 3
 MyRigidBody::MyRigidBody(std::vector<vector3> a_pointList)
@@ -98,45 +133,40 @@ MyRigidBody::MyRigidBody(std::vector<vector3> a_pointList)
 	Init();
 	//Count the points of the incoming list
 	uint uVertexCount = a_pointList.size();
-
 	//If there are none just return, we have no information to create the BS from
 	if (uVertexCount == 0)
 		return;
+	m_v3Minimum = m_v3Maximum = a_pointList[0];
 
-	//Max and min as the first vector of the list
-	m_v3MaxL = m_v3MinL = a_pointList[0];
-
-	//Get the max and min out of the list
 	for (uint i = 1; i < uVertexCount; ++i)
 	{
-		if (m_v3MaxL.x < a_pointList[i].x) m_v3MaxL.x = a_pointList[i].x;
-		else if (m_v3MinL.x > a_pointList[i].x) m_v3MinL.x = a_pointList[i].x;
+		if (m_v3Minimum.x > a_pointList[i].x)
+			m_v3Minimum.x = a_pointList[i].x;
 
-		if (m_v3MaxL.y < a_pointList[i].y) m_v3MaxL.y = a_pointList[i].y;
-		else if (m_v3MinL.y > a_pointList[i].y) m_v3MinL.y = a_pointList[i].y;
+		else if (m_v3Maximum.x < a_pointList[i].x)
+			m_v3Maximum.x = a_pointList[i].x;
 
-		if (m_v3MaxL.z < a_pointList[i].z) m_v3MaxL.z = a_pointList[i].z;
-		else if (m_v3MinL.z > a_pointList[i].z) m_v3MinL.z = a_pointList[i].z;
+		if (m_v3Minimum.y > a_pointList[i].y)
+			m_v3Minimum.y = a_pointList[i].y;
+
+		else if (m_v3Maximum.y < a_pointList[i].y)
+			m_v3Maximum.y = a_pointList[i].y;
+
+		if (m_v3Minimum.z > a_pointList[i].z)
+			m_v3Minimum.z = a_pointList[i].z;
+
+		else if (m_v3Maximum.z < a_pointList[i].z)
+			m_v3Maximum.z = a_pointList[i].z;
 	}
 
-	//with model matrix being the identity, local and global are the same
-	m_v3MinG = m_v3MinL;
-	m_v3MaxG = m_v3MaxL;
+	m_v3Center = (m_v3Maximum + m_v3Minimum) / 2.0f;
+	m_v3Size = (m_v3Maximum - m_v3Minimum);
 
-	//with the max and the min we calculate the center
-	m_v3Center = (m_v3MaxL + m_v3MinL) / 2.0f;
 
-	//we calculate the distance between min and max vectors
-	m_v3HalfWidth = (m_v3MaxL - m_v3MinL) / 2.0f;
-
-	//Get the distance between the center and either the min or the max
-	m_fRadius = glm::distance(m_v3Center, m_v3MinL);
 }
 MyRigidBody::MyRigidBody(MyRigidBody const& other)
 {
 	m_pMeshMngr = other.m_pMeshMngr;
-
-	m_bVisibleBS = other.m_bVisibleBS;
 	m_bVisibleOBB = other.m_bVisibleOBB;
 	m_bVisibleARBB = other.m_bVisibleARBB;
 
@@ -146,13 +176,13 @@ MyRigidBody::MyRigidBody(MyRigidBody const& other)
 	m_v3ColorNotColliding = other.m_v3ColorNotColliding;
 
 	m_v3Center = other.m_v3Center;
-	m_v3MinL = other.m_v3MinL;
-	m_v3MaxL = other.m_v3MaxL;
+	m_v3Minimum = other.m_v3Minimum;
+	m_v3Maximum = other.m_v3Maximum;
 
-	m_v3MinG = other.m_v3MinG;
-	m_v3MaxG = other.m_v3MaxG;
+	m_v3MinimumG = other.m_v3MinimumG;
+	m_v3MaximumG = other.m_v3MaximumG;
 
-	m_v3HalfWidth = other.m_v3HalfWidth;
+	m_v3Size = other.m_v3Size;
 	m_v3ARBBSize = other.m_v3ARBBSize;
 
 	m_m4ToWorld = other.m_m4ToWorld;
@@ -196,45 +226,47 @@ void MyRigidBody::ClearCollidingList(void)
 bool MyRigidBody::IsColliding(MyRigidBody* const other)
 {
 	//check if spheres are colliding
+
+
 	bool bColliding = true;
-	//bColliding = (glm::distance(GetCenterGlobal(), other->GetCenterGlobal()) < m_fRadius + other->m_fRadius);
-	//if they are check the Axis Aligned Bounding Box
-	if (bColliding) //they are colliding with bounding sphere
-	{
-		if (this->m_v3MaxG.x < other->m_v3MinG.x) //this to the right of other
-			bColliding = false;
-		if (this->m_v3MinG.x > other->m_v3MaxG.x) //this to the left of other
-			bColliding = false;
-
-		if (this->m_v3MaxG.y < other->m_v3MinG.y) //this below of other
-			bColliding = false;
-		if (this->m_v3MinG.y > other->m_v3MaxG.y) //this above of other
-			bColliding = false;
-
-		if (this->m_v3MaxG.z < other->m_v3MinG.z) //this behind of other
-			bColliding = false;
-		if (this->m_v3MinG.z > other->m_v3MaxG.z) //this in front of other
-			bColliding = false;
-
-		if (bColliding) //they are colliding with bounding box also
-		{
-			this->AddCollisionWith(other);
-			other->AddCollisionWith(this);
-		}
-		else //they are not colliding with bounding box
-		{
-			this->RemoveCollisionWith(other);
-			other->RemoveCollisionWith(this);
-		}
+	// These if statements check if each of the X, Y, or Z values are not colliding with eachother, and if so it sets the value of bColliding to false.
+	if (m_v3MaximumG.x < other->m_v3MinimumG.x) {
+		bColliding = false;
 	}
-	else //they are not colliding with bounding sphere
+
+	if (m_v3MinimumG.x > other->m_v3MaximumG.x) {
+		bColliding = false;
+	}
+
+	if (m_v3MaximumG.y < other->m_v3MinimumG.y) {
+		bColliding = false;
+	}
+
+	if (m_v3MinimumG.y > other->m_v3MaximumG.y) {
+		bColliding = false;
+	}
+
+	if (m_v3MaximumG.z < other->m_v3MinimumG.z) {
+		bColliding = false;
+	}
+
+	if (m_v3MinimumG.z > other->m_v3MaximumG.z) {
+		bColliding = false;
+	}
+
+	if (bColliding) //they are colliding with bounding box also
+	{
+		this->AddCollisionWith(other);
+		other->AddCollisionWith(this);
+	}
+	else //they are not colliding with bounding box
 	{
 		this->RemoveCollisionWith(other);
 		other->RemoveCollisionWith(this);
 	}
+
 	return bColliding;
 }
-
 void MyRigidBody::AddToRenderList(void)
 {
 	if (m_bVisibleBS)
@@ -247,9 +279,9 @@ void MyRigidBody::AddToRenderList(void)
 	if (m_bVisibleOBB)
 	{
 		if (m_CollidingRBSet.size() > 0)
-			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_m4ToWorld, m_v3Center) * glm::scale(m_v3HalfWidth * 2.0f), m_v3ColorColliding);
+			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_m4ToWorld, m_v3Center) * glm::scale(m_v3Size), m_v3ColorColliding);
 		else
-			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_m4ToWorld, m_v3Center) * glm::scale(m_v3HalfWidth * 2.0f), m_v3ColorNotColliding);
+			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_m4ToWorld, m_v3Center) * glm::scale(m_v3Size), m_v3ColorNotColliding);
 	}
 	if (m_bVisibleARBB)
 	{

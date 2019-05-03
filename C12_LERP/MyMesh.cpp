@@ -278,6 +278,8 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	// Replace this with your code
 	Mesh* pMesh = new Mesh();
 	pMesh->GenerateCone(a_fRadius, a_fHeight, a_nSubdivisions, a_v3Color);
+
+
 	m_lVertexPos = pMesh->GetVertexList();
 	m_uVertexCount = m_lVertexPos.size();
 	SafeDelete(pMesh);
@@ -304,11 +306,19 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Init();
 
 	// Replace this with your code
-	Mesh* pMesh = new Mesh();
-	pMesh->GenerateCylinder(a_fRadius, a_fHeight, a_nSubdivisions, a_v3Color);
-	m_lVertexPos = pMesh->GetVertexList();
-	m_uVertexCount = m_lVertexPos.size();
-	SafeDelete(pMesh);
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		float angle = PI * 2 / a_nSubdivisions;
+		vector3 pointA(0, 0, 0);
+		vector3 pointB(a_fRadius * cos(angle * static_cast<float>(i)), a_fRadius * sin(angle * static_cast<float>(i)), 0);
+		vector3 pointC(a_fRadius * cos(angle * static_cast<float>(i + 1)), a_fRadius * sin(angle * static_cast<float>(i + 1)), 0);
+		vector3 pointAatTop(0, 0, a_fHeight);
+		vector3 pointBatTop((a_fRadius * cos(angle * static_cast<float>(i)), a_fRadius * sin(angle * static_cast<float>(i)), a_fHeight));
+		vector3 pointCatTop(a_fRadius * cos(angle * static_cast<float>(i + 1)), a_fRadius * sin(angle * static_cast<float>(i + 1)), a_fHeight);
+		AddTri(pointA, pointB, pointC);
+		AddQuad(pointB, pointC, pointBatTop, pointCatTop);
+		AddTri(pointAatTop, pointBatTop, pointCatTop);
+	}
 	// -------------------------------
 
 	// Adding information about color

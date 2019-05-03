@@ -16,7 +16,9 @@ void Simplex::MyCamera::SetHorizontalPlanes(vector2 a_v2Horizontal) { m_v2Horizo
 void Simplex::MyCamera::SetVerticalPlanes(vector2 a_v2Vertical) { m_v2Vertical = a_v2Vertical; }
 matrix4 Simplex::MyCamera::GetProjectionMatrix(void) { return m_m4Projection; }
 matrix4 Simplex::MyCamera::GetViewMatrix(void) { CalculateViewMatrix(); return m_m4View; }
-
+vector3 forwardvec;
+vector3 rightvec;
+vector3 upvec;
 Simplex::MyCamera::MyCamera()
 {
 	Init(); //Init the object with default values
@@ -124,7 +126,9 @@ void Simplex::MyCamera::SetPositionTargetAndUpward(vector3 a_v3Position, vector3
 	m_v3Target = a_v3Target;
 
 	m_v3Above = a_v3Position + glm::normalize(a_v3Upward);
-	
+	forwardvec = glm::normalize(m_v3Above - m_v3Position); // Setting starting values for the forward vector, right vector, and upward vector
+	upvec = glm::normalize(m_v3Above - m_v3Position);
+	rightvec = glm::normalize(glm::cross(forwardvec, upvec));
 	//Calculate the Matrix
 	CalculateProjectionMatrix();
 }
@@ -132,7 +136,9 @@ void Simplex::MyCamera::SetPositionTargetAndUpward(vector3 a_v3Position, vector3
 void Simplex::MyCamera::CalculateViewMatrix(void)
 {
 	//Calculate the look at most of your assignment will be reflected in this method
-	m_m4View = glm::lookAt(m_v3Position, m_v3Target, glm::normalize(m_v3Above - m_v3Position)); //position, target, upward
+	m_m4View = glm::lookAt(m_v3Position, m_v3Target, upvec); //position, target, upward
+	
+
 }
 
 void Simplex::MyCamera::CalculateProjectionMatrix(void)
@@ -150,13 +156,42 @@ void Simplex::MyCamera::CalculateProjectionMatrix(void)
 	}
 }
 
-void MyCamera::MoveForward(float a_fDistance)
+void MyCamera::MoveForward(float a_fDistance) // Moves the camera forward or backward when W or S is pressed, using the forward vector
 {
-	//The following is just an example and does not take in account the forward vector (AKA view vector)
-	m_v3Position += vector3(0.0f, 0.0f,-a_fDistance);
-	m_v3Target += vector3(0.0f, 0.0f, -a_fDistance);
-	m_v3Above += vector3(0.0f, 0.0f, -a_fDistance);
+	forwardvec = glm::normalize(m_v3Target - m_v3Position);
+	upvec = glm::normalize(m_v3Above - m_v3Position);
+	m_v3Position += a_fDistance * forwardvec;
+	m_v3Target += a_fDistance * forwardvec;
+	m_v3Above = m_v3Position + upvec;
 }
 
-void MyCamera::MoveVertical(float a_fDistance){}//Needs to be defined
-void MyCamera::MoveSideways(float a_fDistance){}//Needs to be defined
+void MyCamera::MoveVertical(float a_fDistance) // Moves the camera up or down when Q or E is pressed, using the upward vector
+{
+	forwardvec = glm::normalize(m_v3Target - m_v3Position);
+	upvec = glm::normalize(m_v3Above - m_v3Position);
+	m_v3Position += a_fDistance * upvec;
+	m_v3Target += a_fDistance * upvec;
+	m_v3Above = m_v3Position + upvec;
+}
+void MyCamera::MoveSideways(float a_fDistance) // Moves the camera to the left or right when A or D is pressed, using the right vecotr
+{
+	forwardvec = glm::normalize(m_v3Target - m_v3Position);
+	upvec = glm::normalize(m_v3Above - m_v3Position);
+	rightvec = glm::normalize(glm::cross(forwardvec, upvec));
+	m_v3Position += rightvec * a_fDistance;
+	m_v3Target = m_v3Position + forwardvec;
+	m_v3Above = m_v3Position + upvec;
+}
+
+void MyCamera::ChangeYawAndPitch(float fAngleX, float fAngleY) 
+{
+	// Originally had as two separate methods, merged to one for efficiency.
+	glm::quat yaw = glm::angleAxis(glm::degrees(fAngleX) / 10.0f, rightvec);
+	// Calculates the yaw, which is along the X axis
+	glm::quat pitch = glm::angleAxis(glm::degrees(fAngleY) / 10.0f, upvec);
+	// Calculates the pitch, was along the Y Axis
+	forwardvec = glm::rotate(glm::cross(yaw, pitch), glm::normalize(m_v3Target - m_v3Position)); // Applies the rotation to the forward vector
+	rightvec = glm::normalize(glm::cross(forwardvec, upvec)); // Right vector same as in movesideways
+	m_v3Target = m_v3Position + forwardvec;
+	m_v3Above = m_v3Position + upvec;
+}

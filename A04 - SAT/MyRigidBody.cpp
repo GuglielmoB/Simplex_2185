@@ -285,7 +285,6 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	find a separating axis you need to return 0, there is an enum in
 	Simplex that might help you [eSATResults] feel free to use it.
 	(eSATResults::SAT_NONE has a value of 0)
-	*/
 
 	//there is no axis test that separates this two objects
 	return eSATResults::SAT_NONE;
