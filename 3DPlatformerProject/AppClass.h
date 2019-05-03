@@ -26,12 +26,18 @@ class Application
 
 
 
-
+	int j;
 	vector3 m_v3Player; //position of the player
 	quaternion m_qPlayer;
+	quaternion m_qPlatform;
 	matrix4 mSteve;
 	vector3 m_v3Creeper; //position of the player
-	vector3 m_v3Land; //position of the player
+	vector3 m_v3Cow; //position of the player
+	matrix4 mCow;
+	vector3 m_v3Cow2; //position of the player
+	matrix4 mCow2;
+	vector3 m_v3Platform; //position of the player
+	matrix4 mPlatform;
 	MyEntityManager* m_pEntityMngr = nullptr; //Entity Manager
 	//MyOctant* m_pRoot = nullptr; // the root octant
 	//uint m_uOctantID = -1; //Index of Octant to display
@@ -49,6 +55,11 @@ private:
 	bool blocks[7][7];
 	std::vector<vector2> optimalPath;
 	int pathIndex = 1;
+
+	bool blocks2[7][7];
+	std::vector<vector2> optimalPath2;
+	int pathIndex2 = 1;
+
 
 
 	uint m_uRenderCallCount = 0; //count of render calls per frame
@@ -219,6 +230,7 @@ private:
 	*/
 	void CameraRotation(float a_fSpeed = 0.005f);
 	std::vector<vector2> ConstructPath(void);
+	std::vector<vector2> ConstructPlatform(void);
 
 #pragma endregion
 

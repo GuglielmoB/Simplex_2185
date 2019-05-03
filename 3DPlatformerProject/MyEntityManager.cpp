@@ -456,6 +456,20 @@ void Simplex::MyEntityManager::SetPosition(vector3 a_v3Position, String a_sUniqu
 	}
 	return;
 }
+
+Simplex::vector3 Simplex::MyEntityManager::GetPosition(String a_sUniqueID)
+{
+	//Get the entity
+	MyEntity* pTemp = MyEntity::GetEntity(a_sUniqueID);
+	//if the entity exists
+	if (pTemp)
+	{
+		return pTemp->GetPosition();
+	}
+	return vector3(0,0,0);
+}
+
+
 void Simplex::MyEntityManager::SetPosition(vector3 a_v3Position, uint a_uIndex)
 {
 	//if the list is empty return

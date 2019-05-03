@@ -27,6 +27,154 @@ void Application::InitVariables(void)
 	
 
 
+	//m_pEntityMngr->ApplyForce(vector3(0, 10, 0), "Steve");
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_1_Line1_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -12);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform , "Platform_1_Line1_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_1_Line2_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -13);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform, "Platform_1_Line2_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_1_Line3_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -14);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform, "Platform_1_Line3_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_1_Line4_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -15);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform, "Platform_1_Line4_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_1_Line5_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -16);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform, "Platform_1_Line5_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_1_Line6_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -17);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform, "Platform_1_Line6_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_1_Line7_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -18);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform, "Platform_1_Line7_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_1_Line8_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -19);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform, "Platform_1_Line8_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_2_Line1_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -24);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform, "Platform_2_Line1_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_2_Line2_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -25);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform, "Platform_2_Line2_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_2_Line3_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -26);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform, "Platform_2_Line3_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_2_Line4_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -27);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform, "Platform_2_Line4_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_2_Line5_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -28);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform, "Platform_2_Line5_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_2_Line6_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -29);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform, "Platform_2_Line6_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_2_Line7_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -30);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform, "Platform_2_Line7_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+	for (int i = 25; i < 35; i++) {
+		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Platform_2_Line8_" + std::to_string(i));
+		m_v3Platform = vector3(i, -1, -31);
+		mPlatform = glm::translate(m_v3Platform) * ToMatrix4(m_qPlatform) * ToMatrix4(m_qArcBall);
+		m_pEntityMngr->SetModelMatrix(mPlatform, "Platform_2_Line8_" + std::to_string(i));
+		//m_pEntityMngr->SetPosition(vector3(i, -2, -4), "Platform_1_" + std::to_string(i));
+	}
+
+	
+	for (int i = 0; i < 60; i++) {
+
+	m_pEntityMngr->AddEntity("Minecraft\\Cow.obj", "Cow_1_" + std::to_string(i));
+	m_v3Cow = vector3(0, 0, 0);
+	mCow = glm::translate(m_v3Player) * ToMatrix4(m_qPlayer) * ToMatrix4(m_qArcBall);
+	m_pEntityMngr->SetModelMatrix(mCow, "Cow");
+	m_pEntityMngr->SetPosition(vector3(i, 0, 1), "Cow_1_"+ std::to_string(i));
+	m_pEntityMngr->UsePhysicsSolver();
+	m_pEntityMngr->SetMass(1);
+	}
+
+	
 	optimalPath = ConstructPath();
 
 	for (int i = 0; i < 30; i++) {
@@ -89,7 +237,7 @@ void Application::Update(void)
 
 	//Is the first person camera active?
 	CameraRotation();
-
+	//m_v3PlayerVelo.y += 1;
 	mSteve = glm::translate(m_v3Player) * ToMatrix4(m_qPlayer) * ToMatrix4(m_qArcBall);
 	m_pEntityMngr->SetModelMatrix(mSteve, "Steve");
 
@@ -101,6 +249,9 @@ void Application::Update(void)
 	m_pEntityMngr->AddEntityToRenderList(-1, true);
 
 	m_v3Player += m_v3PlayerVelo * .5;
+
+	
+
 
 	// clamp player to ground
 	if (m_v3Player.y < 0)
@@ -114,6 +265,28 @@ void Application::Update(void)
 	if (colliding == true && m_v3Player.y > 5) {
 		m_v3Player.y = m_v3Player.y;
 	}
+
+	
+	
+
+
+
+	for (int i = 0; i < 60; i++) {
+
+		if (m_pEntityMngr->GetPosition("Cow_1_" + std::to_string(i)).z < 0) {
+			m_pEntityMngr->ApplyForce(vector3(0, 0, -10), "Cow_1_" + std::to_string(i));
+		}
+
+		if (m_pEntityMngr->GetPosition("Cow_1_" + std::to_string(i)).x < 0) {
+			m_pEntityMngr->ApplyForce(vector3(-10, 0, 0), "Cow_1_" + std::to_string(i));
+		}
+		if (m_pEntityMngr->GetPosition("Cow_1_" + std::to_string(i)).x > 60) {
+			m_pEntityMngr->ApplyForce(vector3(10, 0, 0), "Cow_1_" + std::to_string(i));
+		}
+
+	
+	}
+	
 
 }
 void Application::Display(void)
@@ -191,6 +364,9 @@ std::vector<vector2> Application::ConstructPath(void) { //makes the path
 
 	return path;
 }
+
+
+
 void Application::Release(void)
 {
 	MyEntityManager::ReleaseInstance();

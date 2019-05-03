@@ -226,7 +226,7 @@ namespace Simplex
 		ARGUMENTS: ---
 		OUTPUT: position of the solver
 		*/
-		vector3 GetPosition(void);
+	    vector3 GetPosition(void);
 
 		/*
 		USAGE: Sets the velocity of the solver
